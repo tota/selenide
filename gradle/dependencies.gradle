@@ -4,7 +4,7 @@ repositories {
 
 ext {
   testngVersion = '6.9.10'
-  seleniumVersion = '4.0.0-alpha-1'
+  seleniumVersion = '4.0.0-alpha-2'
   junitVersion = '5.5.2'
   jettyVersion = '9.4.21.v20190926'
 }
