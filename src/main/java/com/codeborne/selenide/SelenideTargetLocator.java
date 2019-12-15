@@ -14,6 +14,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -45,6 +46,18 @@ public class SelenideTargetLocator implements TargetLocator {
     }
   }
 
+  public WebDriver frame(int index, Duration timeout) {
+    try {
+      return Wait(timeout).until(frameToBeAvailableAndSwitchToIt(index));
+    } catch (NoSuchElementException | TimeoutException e) {
+      throw new NoSuchFrameException("No frame found with index: " + index, e);
+    } catch (InvalidArgumentException e) {
+      throw isFirefox62Bug(e) || isChrome75Error(e)
+        ? new NoSuchFrameException("No frame found with index: " + index, e)
+        : e;
+    }
+  }
+
   @Override
   public WebDriver frame(String nameOrId) {
     try {
@@ -56,10 +69,30 @@ public class SelenideTargetLocator implements TargetLocator {
     }
   }
 
+  public WebDriver frame(String nameOrId, Duration timeout) {
+    try {
+      return Wait(timeout).until(frameToBeAvailableAndSwitchToIt(nameOrId));
+    } catch (NoSuchElementException | TimeoutException e) {
+      throw new NoSuchFrameException("No frame found with id/name: " + nameOrId, e);
+    } catch (InvalidArgumentException e) {
+      throw isFirefox62Bug(e) ? new NoSuchFrameException("No frame found with id/name: " + nameOrId, e) : e;
+    }
+  }
+
   @Override
   public WebDriver frame(WebElement frameElement) {
     try {
       return Wait().until(frameToBeAvailableAndSwitchToIt(frameElement));
+    } catch (NoSuchElementException | TimeoutException e) {
+      throw new NoSuchFrameException("No frame found with element: " + frameElement, e);
+    } catch (InvalidArgumentException e) {
+      throw isFirefox62Bug(e) ? new NoSuchFrameException("No frame found with element: " + frameElement, e) : e;
+    }
+  }
+
+  public WebDriver frame(WebElement frameElement, Duration timeout) {
+    try {
+      return Wait(timeout).until(frameToBeAvailableAndSwitchToIt(frameElement));
     } catch (NoSuchElementException | TimeoutException e) {
       throw new NoSuchFrameException("No frame found with element: " + frameElement, e);
     } catch (InvalidArgumentException e) {
@@ -224,5 +257,9 @@ public class SelenideTargetLocator implements TargetLocator {
 
   private SelenideWait Wait() {
     return new SelenideWait(webDriver, config.timeout(), config.pollingInterval());
+  }
+
+  private SelenideWait Wait(Duration timeout) {
+    return new SelenideWait(webDriver, timeout, config.pollingInterval());
   }
 }

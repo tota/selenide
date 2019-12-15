@@ -12,4 +12,10 @@ public class SelenideWait extends FluentWait<WebDriver> {
     withTimeout(Duration.of(timeout, ChronoUnit.MILLIS));
     pollingEvery(Duration.of(pollingInterval, ChronoUnit.MILLIS));
   }
+
+  public SelenideWait(WebDriver input, Duration timeout, long pollingInterval) {
+    super(input);
+    withTimeout(timeout);
+    pollingEvery(Duration.of(pollingInterval, ChronoUnit.MILLIS));
+  }
 }
